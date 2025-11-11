@@ -34,12 +34,6 @@ wheels/
 *~
 .DS_Store
 
-# Data (especially large video files)
-data/videos/*.mp4
-data/videos/*.avi
-data/videos/*.mov
-data/videos/*.mkv
-
 # Logs
 *.log
 

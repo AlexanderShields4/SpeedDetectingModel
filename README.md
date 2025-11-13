@@ -5,10 +5,9 @@ A fun, real-time application that detects your upper-body pose and facial expres
 ## Features
 
 - **Real-time detection** using MediaPipe Pose and Face Mesh
-- **Expression classification** into three meme categories:
+- **Expression classification** into two meme categories:
   - 🗣️ **messi_yell**: Wide-open mouth (yelling/shouting)
-  - 😊 **mom_homeless_laugh**: Eyes closed, laughing expression
-  - 🐕 **bark_lilnasx**: Energetic arm/head movement
+  - 😊 **mom_homeless_laugh**: Eyes closed, contained laughter expression
 - **Neutral state**: When no strong expression is detected, the app continues to loop the last matched clip
 - **Live metrics display**: See real-time values for eye aspect ratio (EAR) and mouth aspect ratio (MAR)
 - **Smooth classification** with temporal windowing and debouncing to avoid jitter
@@ -36,11 +35,10 @@ pip install -r requirements.txt
 
 ### 4. Add Your Meme Video Clips
 
-Place your three 3-second video files into the `data/videos/` directory:
+Place your two 3-second video files into the `data/videos/` directory:
 
 - `speed_messi.mp4` - for the yelling/wide-mouth expression
-- `speed_mom_homeless.mp4` - for the laughing expression
-- `speed_bark_lilnasx.mp4` - for the energetic movement
+- `speed_mom_homeless.mp4` - for the contained laughing expression
 
 **Example**:
 ```bash
@@ -79,7 +77,6 @@ Edit the thresholds in `src/classifier.py`:
 ```python
 self.MAR_YELL_THRESHOLD = 0.45       # increase for harder yelling detection
 self.EAR_CLOSED_THRESHOLD = 0.18     # adjust eye-closed sensitivity
-self.BARK_HEAD_MOVEMENT = 15.0       # pixels of head oscillation
 ```
 
 ### Changing Video Panel Size
@@ -87,7 +84,7 @@ self.BARK_HEAD_MOVEMENT = 15.0       # pixels of head oscillation
 In `src/app.py`, modify the `VideoPlayer` initialization:
 
 ```python
-video_player = VideoPlayer(label_to_path=label_to_path, panel_size=(640, 480))  # larger panel
+video_player = VideoPlayer(label_to_path=label_to_path, panel_size=(560, 300))  
 ```
 
 ### Changing Webcam Resolution
@@ -95,7 +92,7 @@ video_player = VideoPlayer(label_to_path=label_to_path, panel_size=(640, 480))  
 In `src/app.py`:
 
 ```python
-capture = MediaPipeCapture(cam_index=0, webcam_width=1920, webcam_height=1080)
+capture = MediaPipeCapture(cam_index=0, webcam_width=920, webcam_height=780)
 ```
 
 ## Troubleshooting
@@ -126,8 +123,8 @@ meme_pose_matcher/
 ## How It Works
 
 1. **Capture**: MediaPipe Pose and Face Mesh detect landmarks from your webcam feed (33 pose points, 468 face points).
-2. **Metrics**: Eye aspect ratio (EAR), mouth aspect ratio (MAR), arm extension, and head movement are calculated.
-3. **Classification**: A rule-based classifier examines these metrics over a 0.6-second temporal window and classifies into one of four states: `messi_yell`, `mom_homeless_laugh`, `bark_lilnasx`, or `neutral`.
+2. **Metrics**: Eye aspect ratio (EAR), mouth aspect ratio (MAR), and head movement are calculated.
+3. **Classification**: A rule-based classifier examines these metrics over a 0.6-second temporal window and classifies into one of three states: `messi_yell`, `mom_homeless_laugh`, or `neutral`.
 4. **Debouncing**: To avoid rapid label jitter, the classifier requires a 0.25-second hold before switching to a new expression.
 5. **Playback**: The `VideoPlayer` displays the matched clip (or repeats the last active clip during neutral states).
 6. **UI**: OpenCV window shows the camera feed with skeleton overlays, live metrics, and the video panel.

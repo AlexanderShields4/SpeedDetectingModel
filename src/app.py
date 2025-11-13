@@ -4,7 +4,6 @@ Run with: python -m src.app
 """
 
 import os
-import sys
 from pathlib import Path
 
 from .capture import MediaPipeCapture
@@ -24,7 +23,6 @@ def main():
     label_to_path = {
         "messi_yell": str(videos_dir / "speed_messi.mp4"),
         "mom_homeless_laugh": str(videos_dir / "speed_mom_homeless.mp4"),
-        "bark_lilnasx": str(videos_dir / "speed_bark_lilnasx.mp4"),
     }
 
     # Check if videos exist (warning only, not blocking)
@@ -68,7 +66,7 @@ def main():
     classifier = ExpressionClassifier(window_seconds=0.6)
 
     print("[INFO] Initializing video player...")
-    video_player = VideoPlayer(label_to_path=label_to_path, panel_size=(320, 240))
+    video_player = VideoPlayer(label_to_path=label_to_path, panel_size=(640, 360))
 
     print("[INFO] Initializing UI manager...")
     ui = UIManager(capture, classifier, video_player)

@@ -29,29 +29,27 @@ class UIManager:
         self.panel_x, self.panel_y = 10, 10  # top-left corner of overlay
         self.show_metrics = True  # toggle display of metrics overlay
 
-    def draw_frame_with_overlay(self, frame: np.ndarray, 
-                               pose_landmarks=None, 
+    def draw_frame_with_overlay(self, frame: np.ndarray,
+                               pose_landmarks=None,
                                face_landmarks=None,
                                current_label: str = "neutral",
                                metrics: Optional[Dict] = None) -> np.ndarray:
-        """Draw pose/face skeletons and text info on frame.
-        
+        """Draw face landmarks and text info on frame.
+
         Args:
             frame: BGR frame to draw on
-            pose_landmarks: list of (x,y,z) normalized tuples
+            pose_landmarks: (unused, kept for compatibility)
             face_landmarks: list of (x,y,z) normalized tuples
             current_label: current expression label
-            metrics: dict with 'face' and 'upper' metrics (optional)
-        
+            metrics: dict with 'face' metrics (optional)
+
         Returns:
             annotated frame
         """
         h, w = frame.shape[:2]
         output = frame.copy()
 
-        # Draw upper body skeleton (pose)
-        if pose_landmarks is not None:
-            self._draw_pose_skeleton(output, pose_landmarks, (h, w))
+        # No longer drawing upper body skeleton - focusing on face only
 
         # Draw face mesh (sparse key points)
         if face_landmarks is not None:
@@ -73,32 +71,10 @@ class UIManager:
         return output
 
     def _draw_pose_skeleton(self, frame, pose_landmarks, frame_shape):
-        """Draw upper-body pose skeleton (shoulders, elbows, wrists)."""
-        h, w = frame_shape
-        pts = pose_utils.landmarks_to_np(pose_landmarks, frame_shape)
-
-        # key indices for upper body
-        connections = [
-            (11, 13),  # left shoulder -> left elbow
-            (13, 15),  # left elbow -> left wrist
-            (12, 14),  # right shoulder -> right elbow
-            (14, 16),  # right elbow -> right wrist
-            (11, 12),  # left shoulder -> right shoulder
-        ]
-
-        # draw lines
-        for idx1, idx2 in connections:
-            if idx1 < len(pts) and idx2 < len(pts):
-                p1 = tuple(map(int, pts[idx1]))
-                p2 = tuple(map(int, pts[idx2]))
-                cv2.line(frame, p1, p2, (0, 255, 0), 2)
-
-        # draw circles at joints
-        joint_indices = [11, 12, 13, 14, 15, 16]
-        for idx in joint_indices:
-            if idx < len(pts):
-                center = tuple(map(int, pts[idx]))
-                cv2.circle(frame, center, 5, (0, 255, 255), -1)
+        """DISABLED: No longer drawing pose skeleton (arm detection removed).
+        Method kept for compatibility but does nothing.
+        """
+        pass
 
     def _draw_face_keypoints(self, frame, face_landmarks, frame_shape):
         """Draw key facial landmarks (eyes, nose, mouth)."""
@@ -122,7 +98,7 @@ class UIManager:
                 cv2.circle(frame, center, 3, (255, 0, 0), -1)
 
     def _draw_metrics_text(self, frame, metrics):
-        """Draw face/pose metrics as text on frame."""
+        """Draw face metrics as text on frame."""
         y_offset = 70
         line_height = 25
 
@@ -130,18 +106,12 @@ class UIManager:
         if face_metrics:
             text_ear = f"EAR: {face_metrics.get('ear', 0.0):.3f}"
             text_mar = f"MAR: {face_metrics.get('mar', 0.0):.3f}"
-            cv2.putText(frame, text_ear, (10, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 
+            cv2.putText(frame, text_ear, (10, y_offset), cv2.FONT_HERSHEY_SIMPLEX,
                         0.6, (200, 200, 0), 1)
-            cv2.putText(frame, text_mar, (10, y_offset + line_height), cv2.FONT_HERSHEY_SIMPLEX, 
+            cv2.putText(frame, text_mar, (10, y_offset + line_height), cv2.FONT_HERSHEY_SIMPLEX,
                         0.6, (200, 200, 0), 1)
 
-        upper_metrics = metrics.get("upper")
-        if upper_metrics:
-            left_arm = upper_metrics.get("left_arm_ext", 0.0)
-            right_arm = upper_metrics.get("right_arm_ext", 0.0)
-            text_arm = f"Arm Ext: {left_arm + right_arm:.1f}"
-            cv2.putText(frame, text_arm, (10, y_offset + 2 * line_height), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 0), 1)
+        # No longer displaying arm metrics
 
     def _overlay_panel(self, frame, panel):
         """Overlay the video panel in the corner of the main frame."""

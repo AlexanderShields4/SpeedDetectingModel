@@ -123,46 +123,7 @@ def extract_face_metrics(face_landmarks: List[Tuple[float, float, float]], frame
 
 
 def extract_upper_body_metrics(pose_landmarks: List[Tuple[float, float, float]], frame_shape: Tuple[int, int]):
-    """Return shoulder/elbow/wrist pixel coords and simple arm angles.
-    Uses MediaPipe Pose indexing (33 left_shoulder, 44 right_shoulder etc.).
+    """DISABLED: No longer using arm detection. Kept for compatibility.
+    Returns None to indicate no upper body metrics are extracted.
     """
-    if pose_landmarks is None:
-        return None
-
-    pts = landmarks_to_np(pose_landmarks, frame_shape)
-    # MediaPipe pose indices (mp_pose.PoseLandmark will be referenced in code)
-    # but we use indices directly for speed (these are standard):
-    LEFT_SHOULDER = 11
-    RIGHT_SHOULDER = 12
-    LEFT_ELBOW = 13
-    RIGHT_ELBOW = 14
-    LEFT_WRIST = 15
-    RIGHT_WRIST = 16
-
-    try:
-        ls = pts[LEFT_SHOULDER]
-        rs = pts[RIGHT_SHOULDER]
-        le = pts[LEFT_ELBOW]
-        re = pts[RIGHT_ELBOW]
-        lw = pts[LEFT_WRIST]
-        rw = pts[RIGHT_WRIST]
-    except Exception:
-        return None
-
-    left_elbow_angle = angle(ls, le, lw)
-    right_elbow_angle = angle(rs, re, rw)
-    left_shoulder_angle = angle(le, ls, rs)
-    right_shoulder_angle = angle(re, rs, ls)
-
-    # arm extension measure: distance wrist->shoulder
-    left_arm_ext = np.linalg.norm(lw - ls)
-    right_arm_ext = np.linalg.norm(rw - rs)
-
-    return {
-        "left_elbow_angle": float(left_elbow_angle),
-        "right_elbow_angle": float(right_elbow_angle),
-        "left_shoulder_angle": float(left_shoulder_angle),
-        "right_shoulder_angle": float(right_shoulder_angle),
-        "left_arm_ext": float(left_arm_ext),
-        "right_arm_ext": float(right_arm_ext),
-    }
+    return None
